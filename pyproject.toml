@@ -1,0 +1,12 @@
+[project]
+name = "bank-ops-assistant"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+  "langchain>=1.0", "langgraph>=1.0", "langchain-deepseek",
+  "langchain-chroma", "chromadb", "python-dotenv",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

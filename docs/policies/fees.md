@@ -7,4 +7,4 @@ The chequing account has a monthly account fee of $5. The fee is waived in any m
 Card purchases made in a foreign currency, or with a merchant outside the country, incur an international transaction fee of 3% of the purchase amount. The fee appears as a separate line named "International Transaction Fee" on the same day as the purchase.
 
 ## ATM fees
-Withdrawals at Northwind Bank ATMs are free. Withdrawals at other banks' ATMs cost $2.50 each.
+Withdrawals at Northwind Bank ATMs are free. Withdrawals at other banks' ATMs cost $3.00 each.

@@ -2,6 +2,7 @@ langchain>=1.0
 langgraph>=1.0
 langchain-deepseek
 langchain-chroma
+langchain-text-splitters
 chromadb
 python-dotenv
 pytest

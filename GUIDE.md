@@ -181,29 +181,6 @@ The Actions tab on the GitHub page will automatically run `pytest` once (no key 
 
 ---
 
-## Step 11: How to talk about it in interviews
-
-**One sentence**: A small bank customer-service agent built with LangChain: it answers account questions through scoped tools, answers policy questions with RAG and citations, and requires human approval before any write; I evaluate it on a golden set of 16 cases.
-
-**Connect it to your real experience** (stay honest):
-> "At Microsoft I built a Copilot Studio agent that used tool calling to create Azure DevOps tasks and pull requests, and I built code-level RAG. I made this personal project to understand the same ideas at code level with LangChain, and to practise evaluating an agent systematically."
-
-**Questions you may be asked (think of your own answer first, then check the hints)**
-
-1. How does tool calling work? Who actually executes the function? (The model only outputs the intent to call; the code executes.)
-2. What is the RAG flow? Why chunk? What if retrieval is inaccurate? (Tune chunk size, hybrid search, reranking, add evals.)
-3. How do you stop the agent from overstepping its permissions? (Bind the customer inside the tools, don't rely on the prompt; writes need approval.)
-4. How do you defend against prompt injection? (Treat content as data; tool scoping; output validation; don't rely on any single measure.)
-5. How do you evaluate an agent? (Golden dataset, check tool traces and answers, safety cases, regression on every prompt change.)
-6. Why use SQL for totals instead of letting the model compute them? (Models are bad at exact arithmetic, and they make things up.)
-7. Why isn't approval in the prompt? (A prompt is not a security boundary; the middleware enforces the pause at the code level.)
-8. What would you change to make it a production system? (Model data residency, real authentication, audit logs, monitoring and tracing, a larger eval set, stronger guardrails.)
-9. Why DeepSeek? How do you switch models? (Low cost; it uses `init_chat_model`, so just change `.env`. Real bank data can't be sent to overseas services.)
-
-**Don't say**: that you've done AWS / Bedrock / production-grade agent projects (this is a learning project).
-
----
-
 ## FAQ
 
 | Symptom | What to do |

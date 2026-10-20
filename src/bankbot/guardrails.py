@@ -1,16 +1,16 @@
-"""简单的输入护栏。真正的安全靠 tools.py 里"只能看当前客户的数据"和审批，这里只是第一道过滤。"""
+"""Simple input guardrails. Real safety comes from tools.py ("only see the current customer's data") and approval; this is just a first filter."""
 import re
 
 CARD_RE = re.compile(r"\b(?:\d[ -]?){13,19}\b")
 EMAIL_RE = re.compile(r"[\w.+-]+@[\w-]+\.[\w.-]+")
 INJECTION_HINTS = [
     "ignore all", "ignore previous", "ignore the above", "disregard", "system prompt",
-    "you are now", "忽略以上", "忽略之前",
+    "you are now",
 ]
 
 
 def mask_pii(text: str) -> str:
-    """把卡号和邮箱替换掉，不让它们进入模型 / 日志。"""
+    """Replace card numbers and emails so they never reach the model / logs."""
     text = CARD_RE.sub("[CARD]", text)
     return EMAIL_RE.sub("[EMAIL]", text)
 
@@ -21,5 +21,5 @@ def injection_flags(text: str) -> list[str]:
 
 
 def screen_input(text: str) -> tuple[str, list[str]]:
-    """返回 (处理后的文本, 命中的可疑短语)。可疑只告警，不直接拒绝，因为后面还有工具范围限制兜底。"""
+    """Return (processed text, suspicious phrases matched). Suspicious input only triggers a warning, not a rejection, because tool scoping is the backstop."""
     return mask_pii(text), injection_flags(text)

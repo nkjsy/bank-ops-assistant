@@ -1,4 +1,4 @@
-"""不调用模型，只检查评估集本身格式正确、引用的工具和客户都存在。"""
+"""Doesn't call a model; only checks the eval set is well-formed and the tools and customers it references exist."""
 import json
 from pathlib import Path
 

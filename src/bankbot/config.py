@@ -1,4 +1,4 @@
-"""集中放配置：路径、日期、模型名。其它文件都从这里读。"""
+"""Central config: paths, date, model name. Everything else reads from here."""
 import os
 from pathlib import Path
 
@@ -11,9 +11,9 @@ DB_PATH = Path(os.getenv("BANK_DB", ROOT / "data" / "bank.db"))
 POLICY_DIR = ROOT / "docs" / "policies"
 CHROMA_DIR = Path(os.getenv("CHROMA_DIR", ROOT / ".chroma"))
 
-# 为了让结果可重复，"今天"固定为这个日期（数据也是围绕这个日期生成的）
+# For reproducible results, "today" is fixed to this date (the data is generated around it too)
 AS_OF_DATE = "2026-10-01"
 
 LLM_MODEL = os.getenv("LLM_MODEL", "deepseek:deepseek-chat")
-# EMBEDDINGS=fake 时用不需要下载模型的假向量，只给测试用
+# With EMBEDDINGS=fake, use fake vectors that need no model download; for tests only
 EMBEDDINGS = os.getenv("EMBEDDINGS", "default")

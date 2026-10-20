@@ -1,4 +1,4 @@
-"""RAG：把政策文档切块 -> 向量化 -> 存进 Chroma -> 按问题检索。"""
+"""RAG: split policy docs into chunks -> embed -> store in Chroma -> retrieve by question."""
 import hashlib
 import math
 import re
@@ -11,7 +11,7 @@ from . import config
 
 
 class _HashEmbeddings(Embeddings):
-    """测试用的假向量：把单词哈希到 256 维（词袋）。不需要下载模型，效果粗糙但可重复。"""
+    """Fake embeddings for tests: hash words into 256 dimensions (bag of words). No model download; crude but reproducible."""
 
     def _vec(self, text: str):
         v = [0.0] * 256
@@ -28,7 +28,7 @@ class _HashEmbeddings(Embeddings):
 
 
 class _ChromaDefaultEmbeddings(Embeddings):
-    """用 Chroma 自带的本地模型（all-MiniLM-L6-v2，ONNX，约 80MB，第一次运行自动下载，不需要 key）。"""
+    """Use Chroma's built-in local model (all-MiniLM-L6-v2, ONNX, ~80MB, downloaded automatically on first run, no key needed)."""
 
     def __init__(self):
         from chromadb.utils.embedding_functions import DefaultEmbeddingFunction
@@ -46,7 +46,7 @@ def get_embeddings() -> Embeddings:
 
 
 def load_chunks(policy_dir=None):
-    """读取每个 markdown 文件，按标题（# / ##）切块，并记住来源文件名和标题。"""
+    """Read each markdown file, split into chunks by heading (# / ##), and record the source filename and heading."""
     policy_dir = policy_dir or config.POLICY_DIR
     splitter = MarkdownHeaderTextSplitter([("#", "h1"), ("##", "h2")], strip_headers=False)
     chunks = []
@@ -58,7 +58,7 @@ def load_chunks(policy_dir=None):
 
 
 def build_index(policy_dir=None, persist_dir=None, embeddings=None) -> Chroma:
-    """（重新）建索引。文档改了就重新跑一次。"""
+    """(Re)build the index. Run again whenever the docs change."""
     persist_dir = str(persist_dir or config.CHROMA_DIR)
     store = Chroma(collection_name="policies", embedding_function=embeddings or get_embeddings(),
                    persist_directory=persist_dir)

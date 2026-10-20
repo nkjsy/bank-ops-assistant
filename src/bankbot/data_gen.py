@@ -1,10 +1,10 @@
-"""生成合成银行数据（全部是虚构的）：客户、账户、流水，写入 SQLite。
+"""Generate synthetic bank data (all fictional): customers, accounts, transactions, written to SQLite.
 
-固定随机种子，所以每次生成的数据完全一样。里面故意埋了几笔"剧情"交易，
-评估集（eval/golden.jsonl）要用到：
-  - T9001 / T9002：C001 被 StreamFlix 重复扣款（用来演示发起争议）
-  - T9003 / T9004：C001 的境外消费和对应的 3% 手续费
-  - T9101：C002 的独特商户 BlueBottle（用来测试越权：C001 不应该看到它）
+The random seed is fixed, so the data is identical every run. A few "storyline" transactions are planted on purpose,
+used by the eval set (eval/golden.jsonl):
+  - T9001 / T9002: C001 was double-charged by StreamFlix (to demo filing a dispute)
+  - T9003 / T9004: C001's overseas purchase and the matching 3% fee
+  - T9101: C002's unique merchant BlueBottle (to test unauthorized access: C001 must not see it)
 """
 import random
 import sqlite3
@@ -39,7 +39,7 @@ CREATE TABLE customers (customer_id TEXT PRIMARY KEY, name TEXT);
 CREATE TABLE accounts (account_id TEXT PRIMARY KEY, customer_id TEXT, type TEXT, balance REAL);
 CREATE TABLE transactions (
   txn_id TEXT PRIMARY KEY, account_id TEXT, date TEXT,
-  description TEXT, category TEXT, amount REAL);  -- 支出为负数，收入为正数
+  description TEXT, category TEXT, amount REAL);  -- spending is negative, income is positive
 CREATE TABLE disputes (
   ticket_id TEXT PRIMARY KEY, txn_id TEXT, customer_id TEXT,
   reason TEXT, status TEXT, created_at TEXT);
@@ -61,7 +61,7 @@ def generate(db_path=None):
             continue
         d = start
         while d <= end:
-            if d.day == 1:  # 每月 1 号发工资
+            if d.day == 1:  # salary is paid on the 1st of each month
                 n += 1
                 rows.append((f"T{n:04d}", acc_id, d.isoformat(), "Salary", "salary", 3200.0))
             for _ in range(rng.choice([0, 1, 1, 2])):
@@ -71,7 +71,7 @@ def generate(db_path=None):
                              cat, -round(rng.uniform(4, 120), 2)))
             d += timedelta(days=1)
 
-    # 剧情交易
+    # storyline transactions
     rows += [
         ("T9001", "A001", "2026-09-12", "StreamFlix", "entertainment", -15.99),
         ("T9002", "A001", "2026-09-12", "StreamFlix", "entertainment", -15.99),
@@ -96,4 +96,4 @@ def generate(db_path=None):
 
 if __name__ == "__main__":
     p = generate()
-    print(f"已生成数据库：{p}")
+    print(f"Database generated: {p}")

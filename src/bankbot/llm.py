@@ -1,4 +1,4 @@
-"""按环境变量创建模型。换模型只改 .env 里的 LLM_MODEL，代码不用动。"""
+"""Create the model from environment variables. To switch models, only change LLM_MODEL in .env; no code changes."""
 from langchain.chat_models import init_chat_model
 
 from . import config

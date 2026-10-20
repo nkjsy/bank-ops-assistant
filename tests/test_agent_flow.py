@@ -1,4 +1,4 @@
-"""用假模型测试审批流程：批准后才会写库，拒绝则不写。"""
+"""Test the approval flow with a fake model: the DB is written only after approval, not on rejection."""
 import sqlite3
 
 from conftest import ScriptedModel, call
@@ -20,9 +20,9 @@ def script():
 
 def test_dispute_runs_only_after_approval(db, store):
     agent = build_agent("C001", llm=script(), store=store, db_path=db)
-    result = ask(agent, "dispute T9002", "t1")  # 不传 decide：停在审批处
+    result = ask(agent, "dispute T9002", "t1")  # no decide passed: stops at approval
     assert result["__interrupt__"]
-    assert disputes(db) == 0  # 还没批准，库里没有
+    assert disputes(db) == 0  # not approved yet, nothing in the DB
     from langgraph.types import Command
     agent.invoke(Command(resume={"decisions": [{"type": "approve"}]}),
                  {"configurable": {"thread_id": "t1"}})

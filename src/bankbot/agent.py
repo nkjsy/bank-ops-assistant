@@ -1,4 +1,4 @@
-"""把模型、工具、审批、系统提示组装成 agent。"""
+"""Assemble the model, tools, approval and system prompt into an agent."""
 from langchain.agents import create_agent
 from langchain.agents.middleware import HumanInTheLoopMiddleware
 from langgraph.checkpoint.memory import InMemorySaver
@@ -35,11 +35,11 @@ def build_agent(customer_id: str, llm=None, store=None, db_path=None, checkpoint
 
 
 def ask(agent, text: str, thread_id: str, decide=None):
-    """问一句话，返回最终结果 state。
+    """Ask one question and return the final result state.
 
-    如果 agent 停下来等审批，就调用 decide(action_request) -> {"type": "approve"} 或
-    {"type": "reject", "message": "..."} 来决定，然后让 agent 从断点继续。
-    decide 为 None 时遇到审批会直接返回（state 里有 __interrupt__）。
+    If the agent pauses for approval, call decide(action_request) -> {"type": "approve"} or
+    {"type": "reject", "message": "..."} to decide, then resume the agent from the breakpoint.
+    When decide is None, an approval request returns immediately (state has __interrupt__).
     """
     cfg = {"configurable": {"thread_id": thread_id}}
     result = agent.invoke({"messages": [{"role": "user", "content": text}]}, cfg)
@@ -52,7 +52,7 @@ def ask(agent, text: str, thread_id: str, decide=None):
 
 def final_text(result) -> str:
     content = result["messages"][-1].content
-    if isinstance(content, list):  # 有些模型返回分段内容
+    if isinstance(content, list):  # some models return segmented content
         content = "".join(p.get("text", "") if isinstance(p, dict) else str(p) for p in content)
     return content
 

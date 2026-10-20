@@ -1,7 +1,7 @@
-"""跑评估集： python eval/run_eval.py [--limit N] [--model deepseek:deepseek-chat]
+"""Run the eval set: python eval/run_eval.py [--limit N] [--model deepseek:deepseek-chat]
 
-每条用例检查：该调的工具调了没有、答案里有没有关键信息、有没有泄露不该看的数据、
-审批后是否真的（没）写库。结果写进 eval/reports/，并打印通过率。
+Each case checks: whether the expected tools were called, whether the answer has the key info, whether data that shouldn't be seen leaked,
+and whether the DB was (or wasn't) written after approval. Results go to eval/reports/ and the pass rate is printed.
 """
 import argparse
 import json
@@ -32,18 +32,18 @@ def run_case(case, llm, store, db_path):
     text, called, fails = final_text(result), tools_called(result), []
     for t in case.get("expect_tools", []):
         if t not in called:
-            fails.append(f"没调用工具 {t}")
+            fails.append(f"did not call tool {t}")
     for t in case.get("forbid_tools", []):
         if t in called:
-            fails.append(f"不该调用工具 {t}")
+            fails.append(f"should not have called tool {t}")
     for rx in case.get("answer_regex", []):
         if not re.search(rx, text, re.I):
-            fails.append(f"答案里没找到 /{rx}/")
+            fails.append(f"answer does not match /{rx}/")
     for rx in case.get("answer_not_regex", []):
         if re.search(rx, text, re.I):
-            fails.append(f"答案泄露了 /{rx}/")
+            fails.append(f"answer leaked /{rx}/")
     if "expect_dispute" in case and (after > before) != case["expect_dispute"]:
-        fails.append(f"工单创建与预期不符（预期 {case['expect_dispute']}）")
+        fails.append(f"ticket creation differs from expectation (expected {case['expect_dispute']})")
     return {"id": case["id"], "pass": not fails, "fails": fails, "tools": called, "answer": text}
 
 
@@ -62,19 +62,19 @@ def main():
         store = rag.build_index(persist_dir=Path(tmp) / "chroma")
         results = []
         for c in cases:
-            db_path = data_gen.generate(Path(tmp) / f"{c['id']}.db")  # 每条用例一份新库，互不影响
+            db_path = data_gen.generate(Path(tmp) / f"{c['id']}.db")  # a fresh DB per case so they don't affect each other
             r = run_case(c, llm, store, db_path)
             results.append(r)
             print(("PASS" if r["pass"] else "FAIL"), c["id"], r["fails"] or "")
 
     passed = sum(r["pass"] for r in results)
-    print(f"\n通过 {passed}/{len(results)} = {passed / len(results):.0%}  （模型 {model_name}）")
+    print(f"\nPassed {passed}/{len(results)} = {passed / len(results):.0%}  (model {model_name})")
 
     out = ROOT / "eval" / "reports"
     out.mkdir(exist_ok=True)
     stamp = datetime.now().strftime("%Y%m%d_%H%M")
-    lines = [f"# Eval {stamp}", f"模型：{model_name}", f"通过率：{passed}/{len(results)}", "",
-             "| 用例 | 结果 | 调用的工具 | 问题 |", "|---|---|---|---|"]
+    lines = [f"# Eval {stamp}", f"Model: {model_name}", f"Pass rate: {passed}/{len(results)}", "",
+             "| Case | Result | Tools called | Issues |", "|---|---|---|---|"]
     for r in results:
         lines.append(f"| {r['id']} | {'PASS' if r['pass'] else 'FAIL'} | {', '.join(r['tools'])} | {'; '.join(r['fails'])} |")
     (out / f"{stamp}.md").write_text("\n".join(lines), encoding="utf-8")

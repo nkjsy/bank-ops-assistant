@@ -1,7 +1,7 @@
-"""agent 能用的工具。
+"""Tools the agent can use.
 
-关键设计：build_tools(customer_id) 把"当前客户"锁死在每个工具里。
-模型即使被诱导，也只能查到这个客户自己的账户 —— 权限由代码保证，而不是靠 prompt 劝说。
+Key design: build_tools(customer_id) locks the "current customer" into every tool.
+Even if the model is manipulated, it can only see this customer's own accounts: permissions are enforced by code, not by prompt persuasion.
 """
 import json
 import sqlite3
@@ -97,5 +97,5 @@ def build_tools(customer_id: str, db_path=None, store=None):
     return [list_accounts, list_transactions, spending_summary, search_policy, create_dispute_ticket]
 
 
-# 需要人工审批的工具（写操作）
+# Tools that need human approval (write operations)
 APPROVAL_REQUIRED = ["create_dispute_ticket"]

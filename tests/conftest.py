@@ -1,6 +1,6 @@
 import os
 
-os.environ["EMBEDDINGS"] = "fake"  # 测试里不下载向量模型
+os.environ["EMBEDDINGS"] = "fake"  # don't download the embedding model in tests
 
 import pytest
 from langchain_core.language_models.chat_models import BaseChatModel
@@ -11,7 +11,7 @@ from bankbot import data_gen, rag
 
 
 class ScriptedModel(BaseChatModel):
-    """假模型：按剧本依次返回预先写好的回复，用来测试 agent 的流程，不需要 API key。"""
+    """Fake model: returns pre-written replies in order, used to test the agent flow without an API key."""
     responses: list
     i: int = 0
 

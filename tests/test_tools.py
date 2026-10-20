@@ -15,7 +15,7 @@ def test_customer_only_sees_own_accounts(db):
 
 def test_cannot_read_other_customers_account(db):
     t = tool_map(db, "C001")
-    out = t["list_transactions"].invoke({"account_id": "A003"})  # A003 属于 C002
+    out = t["list_transactions"].invoke({"account_id": "A003"})  # A003 belongs to C002
     assert out.startswith("Error")
     assert "BlueBottle" not in out
 

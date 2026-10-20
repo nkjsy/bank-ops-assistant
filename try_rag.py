@@ -1,6 +1,6 @@
 from bankbot import rag
 
-store = rag.build_index()          # 第一次会下载约 80MB 的本地向量模型，需要几分钟
+store = rag.build_index()          # downloads a ~80MB local embedding model on first run, takes a few minutes
 for q in ["how long do I have to report a disputed charge",
           "what does an overseas card purchase cost extra",
           "lost card what do I do"]:
